@@ -1,0 +1,163 @@
+// Lonely Monoliths --- original Tracery script
+
+{
+	"about":["'lonely monoliths' - @threadsmind"],
+	"version":["0.4.12"],
+	"notes1":["Temporarily removed gBlur from the monoliths due to an issue that seems to come from the svg->jpg conversion. Find & replace 'placeholder'->'filter' to reset."],
+	"notes2":["Temporarily removed tms from the generation stack due to an issue with the svg->jpg conversion miscoloring the masking layer."],
+
+
+
+	"origin":["#set-globals# #opening# #about# #defs# #svg-bg# #content# #closing#"],
+	
+	"set-globals":["#set-color-variables# #set-position-variables#"],
+	
+	"set-color-variables":["[c-gs-light:#hex-digits-light##hex-digits-full#] [c-gs-mid:#hex-digits-mid##hex-digits-full#] [c-gs-dark:#hex-digits-dark##hex-digits-full#] [c-grade:#hex-digits-nondark##hex-digits-full##hex-digits-nondark##hex-digits-full##hex-digits-full##hex-digits-full#]"],
+	"set-position-variables":["[mask-width:50] [mask-offset:25]", "[mask-width:60] [mask-offset:20]", "[mask-width:56] [mask-offset:22]", "[mask-width:54] [mask-offset:23]", "[mask-width:52] [mask-offset:24]" ],
+	
+	"img-width":["512"],
+	"img-height":["512"],
+	
+	"opening":["{svg <svg width='#img-width#' height='#img-height#'  xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1'>"],
+	"defs":["<defs>#def-gradient# #def-blur-ground# #def-blur-main# #def-blur-tms# #def-blur-tmf-shadow# #def-blur-thing-b# #def-blur-thing-s# #def-blur-thing-f# #def-texture# #def-canvas-mask# #def-tms-mask# #def-thing-mask-big# #def-thing-mask-small# #def-thing-mask-float#</defs>"],
+	"svg-bg":["<rect width='#img-width#' height='#img-height#' rx='5' ry='5' fill='\\#000000' /><text font-family='Helvetica' font-size='12' x='323' y='-2' fill='\\#090909' transform='rotate(90)'>#about#</text><text font-family='Helvetica' font-size='12' x='478' y='509' fill='\\#090909'>v#version#</text>"],
+	"content":["<g mask='url(\\#canvas-mask)'><g placeholder='\\#blur-main'> #content-design# </g></g>"],
+	"closing":["</svg>}"],
+	
+	"content-design":["#layer-background# #layer-ground# #thing-layer# #layer-color-grade#"],
+	"thing-layer":["#layer-thing-middle-large#", "#layer-thing-float#", "#layer-thing-float#", "#layer-thing-float#"],
+	
+	
+	
+	"layer-background":["<rect width='#img-width#' height='#img-height#' fill='url(\\#master-gradient)' />"],
+	"layer-ground":["<rect width='100%' height='#ground-height#%' x='0' y='-512' transform='scale(1,-1)' fill='\\##c-gs-light##c-gs-light##c-gs-light#' opacity='0.6' filter='url(\\#blur-ground)' />"],
+	"layer-thing-middle-large":["#thing-mask-start-big# #tml-design# #thing-mask-stop#"],
+	"layer-thing-middle-small":["#thing-mask-start-small# <g mask='url(\\#tms-mask)'> #tms-design# </g> #thing-mask-stop#"],
+	"layer-thing-float":["#thing-mask-start-float# #tmf-design# #thing-mask-stop# #create-tmf-shadow#"],
+	"layer-thing-polygon":["TODO"],
+	"layer-color-grade":["<rect width='#img-width#' height='#img-height#' fill='\\##c-grade#' opacity='0.#opacity-c-grade#' />"],
+	
+	
+	
+	"create-tml-main-rect":["#tml-set-main-width# #tml-set-rect-curve#<rect width='#tml-main-width#%' height='#tml-rect-main-height#' x='#tml-main-offset#%' y='-#tml-rect-main-y#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' transform='scale(1,-1)' opacity='1.0' rx='#tml-rect-curve#' ry='#tml-rect-curve#' />"],
+	"create-tml-circle":["<circle cx='50%' cy='#tml-circle-height#%' r='#tml-circle-radius#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' opacity='1.0' /> #tml-design#"],
+	"create-tml-rect":["#tml-set-rect-width# #tml-set-rect-curve-all#<rect width='#tml-rect-width#%' height='#tml-rect-height#' x='#tml-rect-offset#%' y='#tml-rect-y#' opacity='1.0' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' rx='#tml-rect-curve#' ry='#tml-rect-curve#' /> #tml-design#"],
+	
+	"create-tms-main-rect":["#tms-set-main-width# #tms-set-rect-curve#<rect width='#tms-main-width#%' height='#tms-rect-main-height#' x='#tms-main-offset#%' y='-#tms-rect-main-y#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' transform='scale(1,-1)' opacity='1.0' rx='#tms-rect-curve#' ry='#tms-rect-curve#' />"],
+	"create-tms-rect":["#tms-set-width# #tms-set-rect-curve#<rect name='tms rect' width='#tms-width#%' height='#tms-rect-height#' x='#tms-offset#%' y='-#tms-rect-y#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' transform='scale(1,-1)' opacity='1.0' rx='#tms-rect-curve#' ry='#tms-rect-curve#' /> #tms-design#"],
+	"create-tms-circle":["<circle cx='50%' cy='#tms-circle-height#%' r='#tms-circle-radius#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' opacity='1.0' /> #tms-design#"],
+	
+	"create-tmf-main-circle":["<circle cx='50%' cy='#tmf-circle-height#%' r='#tmf-circle-radius#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' opacity='1.0' /> "],
+	"create-tmf-rect":["#tmf-set-width# <rect name='tmf rect' width='#tmf-width#%' height='#tmf-rect-height#' x='#tmf-offset#%' y='-#tmf-rect-y#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' transform='scale(1,-1)' opacity='1.0' rx='#curves-rect-steep#' ry='#curves-rect-steep#' /> #tmf-design#"],
+	"create-tmf-circle":["<circle cx='50%' cy='#tmf-circle-height#%' r='#tmf-circle-radius#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' opacity='1.0' /> #tmf-design#"],
+	
+	"create-tmf-shadow":["#tmf-set-shadow-width# <rect width='#tmf-shadow-width#%' height='20' x='#tmf-shadow-offset#%' y='-#tmf-rect-shadow-y#' fill='\\##c-gs-dark##c-gs-dark##c-gs-dark#' transform='scale(1,-1)' opacity='#opacity-tmf-shadow#' rx='50' ry='30' filter='url(\\#blur-tmf-shadow)'/> "],
+	
+	"create-thing-mask-big":["#create-thing-final#", "#create-thing-circle-big#"],
+	"create-thing-mask-small":["#create-thing-final#", "#create-thing-circle-small#"],
+	"create-thing-mask-float":["#create-thing-final#", "#create-thing-circle-float#", "#create-thing-circle-float#", "#create-thing-circle-float#"],
+	"create-thing-final":[""],
+	"create-thing-circle-big":["<circle cx='50%' cy='#thing-circle-height-big#%' r='#thing-circle-radius-big#' fill='\\#000000' /> #create-thing-mask-big#"],
+	"create-thing-circle-small":["<circle cx='50%' cy='#thing-circle-height-small#%' r='#thing-circle-radius-small#' fill='\\#000000' /> #create-thing-mask-small#"],
+	"create-thing-circle-float":["<circle cx='50%' cy='#thing-circle-height-float#%' r='#thing-circle-radius-float#' fill='\\#000000' /> #create-thing-mask-float#"],
+	
+	
+	
+	"ground-height":["32", "32.4", "32.8", "33", "33.2", "33.5", "33.9", "34.3"],
+	
+	"thing-mask-start-big":["<g mask='url(\\#thing-mask-big)'>"],
+	"thing-mask-start-small":["<g mask='url(\\#thing-mask-small)'>"],
+	"thing-mask-start-float":["<g mask='url(\\#thing-mask-float)'>"],
+	"thing-mask-stop":["</g>"],
+	"thing-circle-height-big":["50", "10", "20", "30", "40", "35", "45", "55", "46", "56", "54", "63", "58", "51", "52", "53", "54", "55", "56", "57", "58", "59", "14", "17", "19", "21", "33", "27", "35"],
+	"thing-circle-radius-big":["10", "20", "15", "25", "12", "22", "14", "24", "16", "18", "11", "13", "17", "19", "21", "23", "10", "13", "14", "15", "16"],
+	"thing-circle-height-small":["50", "60", "45", "55", "46", "56", "66", "54", "63", "58", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67"],
+	"thing-circle-radius-small":["20", "15", "25", "22", "14", "24", "16", "18", "17", "19", "21", "23", "10", "13", "14", "15", "16", "26", "27", "28", "29", "30", "31", "32", "33", "23", "24", "25", "26"],
+	"thing-circle-height-float":["50", "60", "41", "45", "55", "46", "56", "66", "54", "63", "58", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "44", "46", "55", "51", "48", "30", "40"],
+	"thing-circle-radius-float":["20", "25", "22", "14", "24", "16", "18", "17", "19", "21", "23", "10", "13", "14", "16", "26", "27", "28", "29", "30", "31", "32", "33", "23", "24", "25", "26", "31", "27", "25", "26", "33", "36", "23", "24", "28"],
+	
+	"tml-design":["#create-tml-circle#", "#create-tml-circle#", "#create-tml-main-rect#", "#create-tml-rect#", "#create-tml-rect#", "#create-tml-rect#", "#create-tml-rect#"],
+	"tml-circle-height":["20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
+	"tml-circle-radius":["50", "53", "61", "58", "63", "59", "73", "64", "66", "71", "76", "55", "60", "65", "70", "75", "40", "58", "51", "80", "100", "30", "40", "35", "52", "58", "55", "56", "53", "45", "33", "43", "37", "47", "52"],
+	"tml-rect-main-height":["150", "200", "240", "160", "170", "180", "190", "210", "220", "230", "240", "160", "170", "180", "190", "210", "220", "230", "240", "183", "185", "186", "187", "192", "193", "194", "195", "196", "197", "198", "201", "203", "204", "205", "206", "207", "208", "217", "216", "218", "229"],
+	"tml-rect-main-y":["360", "370", "380", "365", "375", "363", "373", "383", "367", "361", "362", "363", "364", "365", "366", "371", "372"],
+	"tml-rect-y":["220", "210", "200", "100", "110", "120", "130", "140", "150", "160", "170", "180", "190"],
+	"tml-rect-height":["20", "40", "50", "60", "70", "80", "90", "45", "55", "65", "75", "85", "95", "84", "74", "64", "94", "96", "86", "76", "66", "100", "110", "120", "130", "105", "125", "125", "102", "112", "122", "132"],
+	"tml-set-main-width":["[tml-main-width:18] [tml-main-offset:41]", "[tml-main-width:16] [tml-main-offset:42]", "[tml-main-width:14] [tml-main-offset:43]", "[tml-main-width:12] [tml-main-offset:44]", "[tml-main-width:20] [tml-main-offset:40]", "[tml-main-width:16] [tml-main-offset:42]", "[tml-main-width:12] [tml-main-offset:44]", "[tml-main-width:10] [tml-main-offset:45]","[tml-main-width:14] [tml-main-offset:43]", "[tml-main-width:10] [tml-main-offset:45]", "[tml-main-width:8] [tml-main-offset:46]"],
+	"tml-set-rect-width":["[tml-rect-width:16][tml-rect-offset:42]", "[tml-rect-width:18] [tml-rect-offset:41]", "[tml-rect-width:16] [tml-rect-offset:42]", "[tml-rect-width:14] [tml-rect-offset:43]", "[tml-rect-width:20] [tml-rect-offset:40]", "[tml-rect-width:22] [tml-rect-offset:39]", "[tml-rect-width:24] [tml-rect-offset:38]", "[tml-rect-width:20] [tml-rect-offset:40]", "[tml-rect-width:22] [tml-rect-offset:39]", "[tml-rect-width:24] [tml-rect-offset:38]"],
+	"tml-set-rect-curve":["[tml-rect-curve:#curves-rect#]"],
+	"tml-set-rect-curve-all":["[tml-rect-curve:#curves-rect-steep#]", "[tml-rect-curve:#curves-rect#]"],
+	
+	"tms-design":["#create-tms-main-rect#", "#create-tms-rect#", "#create-tms-rect#", "#create-tms-rect#", "#create-tms-circle#", "#create-tms-circle#", "#create-tms-circle#"],
+	"tms-rect-main-height":["150", "160", "100", "110", "120", "130", "140", "145", "135", "125", "115", "105", "95", "90", "85"],
+	"tms-rect-main-y":["360", "370", "380", "365", "375", "363", "373", "383", "367", "361", "362", "363", "364", "365", "366", "371", "372"],
+	"tms-mask-offset-x":["151", "152", "150", "148", "149", "147", "146"],
+	"tms-rect-height":["100", "110", "135", "125", "115", "105", "95", "90", "85"],
+	"tms-rect-y":["370", "380", "365", "375", "363", "373", "383", "367", "363", "364", "365", "366", "371", "372"],
+	"tms-set-main-width":["[tms-main-width:22] [tms-main-offset:39]", "[tms-main-width:24] [tms-main-offset:38]", "[tms-main-width:14] [tms-main-offset:43]", "[tms-main-width:12] [tms-main-offset:44]", "[tms-main-width:20] [tms-main-offset:40]", "[tms-main-width:16] [tms-main-offset:42]", "[tms-main-width:12] [tms-main-offset:44]", "[tms-main-width:10] [tms-main-offset:45]","[tms-main-width:14] [tms-main-offset:43]", "[tms-main-width:10] [tms-main-offset:45]", "[tms-main-width:8] [tms-main-offset:46]"],
+	"tms-set-width":["[tms-width:26] [tms-offset:37]", "[tms-width:24] [tms-offset:38]", "[tms-width:28] [tms-offset:36]", "[tms-width:12] [tms-offset:44]", "[tms-width:10] [tms-offset:45]", "[tms-width:16] [tms-offset:42]", "[tms-width:12] [tms-offset:44]", "[tms-width:10] [tms-offset:45]","[tms-width:14] [tms-offset:43]", "[tms-width:26] [tms-offset:37]", "[tms-width:8] [tms-offset:46]"],
+	"tms-set-rect-curve":["[tms-rect-curve:#curves-rect-steep#]"],
+	"tms-circle-height":["50", "55", "60", "65", "70", "75", "52", "54", "56", "58", "62", "64", "66", "68", "72", "74"],
+	"tms-circle-radius":["50", "40", "45", "51", "53", "49", "55", "57", "59", "61", "63", "71", "55", "60", "65", "70", "75", "80", "85", "90", "54", "64", "74", "84", "94", "56", "66", "76", "86", "58", "68", "61", "71"],
+	
+	"tmf-design":["#create-tmf-main-circle#", "#create-tmf-rect#", "#create-tmf-rect#", "#create-tmf-circle#", "#create-tmf-circle#", "#create-tmf-circle#", "#create-tmf-rect#", "#create-tmf-circle#"],
+	"tmf-rect-height":["100", "110", "125", "115", "105", "95", "90", "85", "80", "88", "93", "99", "92", "86", "87", "89"],
+	"tmf-rect-y":["300", "310", "290", "280", "295", "292", "303", "273", "276", "282", "288", "285", "309", "268"],
+	"tmf-set-width":["[tmf-width:20] [tmf-offset:40]", "[tmf-width:18] [tmf-offset:41]", "[tmf-width:12] [tmf-offset:44]", "[tmf-width:10] [tmf-offset:45]", "[tmf-width:16] [tmf-offset:42]", "[tmf-width:12] [tmf-offset:44]", "[tmf-width:10] [tmf-offset:45]","[tmf-width:14] [tmf-offset:43]", "[tmf-width:8] [tmf-offset:46]"],
+	"tmf-circle-height":["50", "53", "47", "51", "49", "50", "42", "40", "38", "43", "46", "50", "45", "37", "39", "41"],
+	"tmf-circle-radius":["50", "49", "48", "47", "51", "52", "53", "54", "55", "57", "59", "45"],
+	
+	"tmf-set-shadow-width":["[tmf-shadow-width:20] [tmf-shadow-offset:40]", "[tmf-shadow-width:18] [tmf-shadow-offset:41]", "[tmf-shadow-width:16] [tmf-shadow-offset:42]"],
+	"tmf-rect-shadow-y":["387", "384", "385", "383", "380", "386", "381", "382", "390"],
+	
+	
+	
+	"def-gradient":["<linearGradient id='master-gradient' gradientTransform='rotate(90)'> <stop offset='#gradient-offset-top#%' stop-color='\\#ffffff' /> <stop offset='#gradient-offset-bottom#%' stop-color='\\##c-gs-dark##c-gs-dark##c-gs-dark#' /> </linearGradient>"],
+	"def-blur-ground":["<filter id='blur-ground'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-ground#' /></filter>"],
+	"def-blur-main":["<filter id='blur-main'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-main#' /></filter>"],
+	"def-blur-tms":["<filter id='blur-tms-mask'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-main#' /></filter>"],
+	"def-blur-tmf-shadow":["<filter id='blur-tmf-shadow'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-tmf-shadow#' /></filter>"],
+	"def-blur-thing-b":["<filter id='blur-thing-mask-big'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-main#' /></filter>"],
+	"def-blur-thing-s":["<filter id='blur-thing-mask-small'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-main#' /></filter>"],
+	"def-blur-thing-f":["<filter id='blur-thing-mask-float'><feGaussianBlur in='SourceGraphic' stdDeviation='#blur-main#' /></filter>"],
+	"def-texture":["TODO: def texture"],
+	"def-canvas-mask":["<mask id='canvas-mask'><rect width='#mask-width#%' height='100%' x='#mask-offset#%' y='0' rx='5' ry='5' fill='\\#ffffff' /></mask>"],
+	"def-tms-mask":["<mask id='tms-mask'><rect width='100%' height='100%' x='0' y='-#tms-mask-offset-x#' fill='\\#ffffff' filter='url(\\#blur-tms-mask)' /></mask>"],
+	"def-thing-mask-big":["<mask id='thing-mask-big'><g filter='url(\\#blur-thing-mask-big)'><rect width='532' height='532' x='-10' y='10' fill='\\#ffffff' />#create-thing-mask-big#</g></mask>"],
+	"def-thing-mask-small":["<mask id='thing-mask-small'><g filter='url(\\#blur-thing-mask-small)'><rect width='532' height='532' x='-10' y='10' fill='\\#ffffff' />#create-thing-mask-small#</g></mask>"],
+	"def-thing-mask-float":["<mask id='thing-mask-float'><g filter='url(\\#blur-thing-mask-float)'><rect width='532' height='532' x='-10' y='10' fill='\\#ffffff' />#create-thing-mask-float#</g></mask>"],
+	
+	"hex-digits-full":["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"],
+	"hex-digits-dark":["1", "2", "3", "4", "5"],
+	"hex-digits-mid":["6", "7", "8", "9", "a", "b"],
+	"hex-digits-light":["c", "d", "e", "f"],
+	"hex-digits-nondark":["6", "7", "8", "9", "a", "b", "c", "d", "e", "f"],
+	
+	"opacity-c-grade":["14", "18", "16", "20", "19", "21", "17", "22", "25", "28", "30", "15", "20", "18", "38", "51", "70", "82", "14", "18", "16", "20", "19", "21", "17", "22", "25", "28", "17", "16", "22", "20", "19", "18"],
+	"opacity-tmf-shadow":["5", "55", "6", "65", "7", "53", "57", "63", "67", "58", "62"],
+	
+	"blur-main":["0.2", "0.3", "0.4"],
+	"blur-tmf-shadow":["2.0", "2.3", "1.8", "2.1"],
+	"blur-ground":["0.6", "0.7", "0.8"],
+	
+	"curves-rect":["1", "2", "3", "4", "5", "6", "7", "8", "9", "4", "5", "6", "7", "5", "6", "5", "10"],
+	"curves-rect-steep":["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"],
+	
+	"gradient-offset-top":["0", "0", "1", "2", "3", "4", "5", "5", "10", "15"],
+	"gradient-offset-bottom":["100", "99", "98", "97", "96", "95", "95", "90", "85"],
+
+
+
+	"end-of-file":[""]
+}
+
+
+
+
+
+
+
+
+
+
+
