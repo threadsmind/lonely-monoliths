@@ -1,0 +1,82 @@
+<svg width="512" height="512"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"> 'lonely monoliths' - @threadsmind 
+    <defs>
+        <linearGradient id="master-gradient" gradientTransform="rotate(90)">
+            <stop offset="1%" stop-color="#ffffff"></stop>
+            <stop offset="100%" stop-color="#242424"></stop>
+        </linearGradient>
+        <filter id="blur-ground">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.6"></feGaussianBlur>
+        </filter>
+        <filter id="blur-main">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.2"></feGaussianBlur>
+        </filter>
+        <filter id="blur-tms-mask">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.4"></feGaussianBlur>
+        </filter>
+        <filter id="blur-tmf-shadow">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.8"></feGaussianBlur>
+        </filter>
+        <filter id="blur-thing-mask-big">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.3"></feGaussianBlur>
+        </filter>
+        <filter id="blur-thing-mask-small">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.3"></feGaussianBlur>
+        </filter>
+        <filter id="blur-thing-mask-float">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.4"></feGaussianBlur>
+        </filter> TODO: def texture 
+        <mask id="canvas-mask">
+            <rect width="56%" height="100%" x="22%" y="0" rx="5" ry="5" fill="#ffffff"></rect>
+        </mask>
+        <mask id="tms-mask">
+            <rect width="100%" height="100%" x="0" y="-150" fill="#ffffff" filter="url(#blur-tms-mask)"></rect>
+        </mask>
+        <mask id="thing-mask-big">
+            <g filter="url(#blur-thing-mask-big)">
+                <rect width="532" height="532" x="-10" y="10" fill="#ffffff"></rect>
+            </g>
+        </mask>
+        <mask id="thing-mask-small">
+            <g filter="url(#blur-thing-mask-small)">
+                <rect width="532" height="532" x="-10" y="10" fill="#ffffff"></rect>
+                <circle cx="50%" cy="67%" r="23" fill="#000000"></circle>
+                <circle cx="50%" cy="53%" r="33" fill="#000000"></circle>
+                <circle cx="50%" cy="64%" r="30" fill="#000000"></circle>
+                <circle cx="50%" cy="52%" r="27" fill="#000000"></circle>
+            </g>
+        </mask>
+        <mask id="thing-mask-float">
+            <g filter="url(#blur-thing-mask-float)">
+                <rect width="532" height="532" x="-10" y="10" fill="#ffffff"></rect>
+                <circle cx="50%" cy="41%" r="31" fill="#000000"></circle>
+            </g>
+        </mask>
+    </defs>
+    <rect width="512" height="512" rx="5" ry="5" fill="#000000"></rect>
+    <text font-family="Helvetica" font-size="12" x="323" y="-2" fill="#090909" transform="rotate(90)">'lonely monoliths' - @threadsmind</text>
+    <text font-family="Helvetica" font-size="12" x="478" y="509" fill="#090909">v0.4.12</text>
+    <g mask="url(#canvas-mask)">
+        <g placeholder="#blur-main">
+            <rect width="512" height="512" fill="url(#master-gradient)"></rect>
+            <rect width="100%" height="32.4%" x="0" y="-512" transform="scale(1,-1)" fill="#ffffff" opacity="0.6" filter="url(#blur-ground)"></rect>
+            <g mask="url(#thing-mask-float)">
+                <circle cx="50%" cy="53%" r="55" fill="#242424" opacity="1.0"></circle>
+                <circle cx="50%" cy="42%" r="54" fill="#242424" opacity="1.0"></circle>
+                <circle cx="50%" cy="42%" r="53" fill="#242424" opacity="1.0"></circle>
+                <circle cx="50%" cy="47%" r="52" fill="#242424" opacity="1.0"></circle>
+                <rect name="tmf rect" width="10%" height="115" x="45%" y="-288" fill="#242424" transform="scale(1,-1)" opacity="1.0" rx="22" ry="15"></rect>
+                <rect name="tmf rect" width="10%" height="85" x="45%" y="-288" fill="#242424" transform="scale(1,-1)" opacity="1.0" rx="30" ry="14"></rect>
+                <circle cx="50%" cy="50%" r="54" fill="#242424" opacity="1.0"></circle>
+                <rect name="tmf rect" width="18%" height="105" x="41%" y="-282" fill="#242424" transform="scale(1,-1)" opacity="1.0" rx="22" ry="15"></rect>
+                <circle cx="50%" cy="50%" r="53" fill="#242424" opacity="1.0"></circle>
+                <circle cx="50%" cy="50%" r="52" fill="#242424" opacity="1.0"></circle>
+                <rect name="tmf rect" width="12%" height="95" x="44%" y="-273" fill="#242424" transform="scale(1,-1)" opacity="1.0" rx="20" ry="10"></rect>
+                <circle cx="50%" cy="50%" r="54" fill="#242424" opacity="1.0"></circle>
+            </g>
+            <rect width="20%" height="20" x="40%" y="-390" fill="#242424" transform="scale(1,-1)" opacity="53" rx="50" ry="30" filter="url(#blur-tmf-shadow)"></rect>
+            <rect width="512" height="512" fill="#ca8e7f" opacity="0.38"></rect>
+        </g>
+    </g>
+</svg>

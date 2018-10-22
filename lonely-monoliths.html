@@ -19,7 +19,8 @@
             font-family: 'Indie Flower', sans-serif;
         }
 
-        img {
+        img,
+        svg {
             display: block;
         }
 
@@ -44,7 +45,7 @@
             letter-spacing: .6em;
         }
 
-        #m {
+        .m {
             width: calc(100% - 2px);
             border: 1px solid #2b2b2b;
             overflow: hidden;
@@ -70,6 +71,10 @@
             background-color: #2b2b2b;
         }
 
+        .cover {
+            animation: Unveil 2s forwards;
+        }
+
         .f>div {
             padding-top: 5px;
         }
@@ -91,6 +96,15 @@
                 padding-top: 0;
             }
         }
+
+        @keyframes Unveil {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -99,8 +113,13 @@
         <div class="p h t b d">
             lonely monoliths
         </div>
-        <div id="m" class="b p">
-            <img src="p.svg">
+        <div class="m b p">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+                <g id="canvas">
+                    <rect fill="#2b4444" height="100" width="100" />
+                </g>
+                <rect id="cover" fill="#2b2b2b" height="100" width="100" />
+            </svg>
         </div>
         <div class="f p t b d">
             <div>
@@ -114,8 +133,7 @@
             </div>
         </div>
     </div>
-    <script src="" async defer></script>
+    <script src="lonely-monoliths.js" async defer></script>
 </body>
 
 </html>
-

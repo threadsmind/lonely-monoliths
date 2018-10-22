@@ -6,15 +6,43 @@ this script creates an svg image
 */
 
 
-//grab the canvas div
-var canvas = document.getElementById("m");
+(function () {
+    function generateRandomNumber(randLow, randHigh) {
+        return Math.floor(Math.random() * (randHigh - randLow + 1)) + randLow;
+    }
 
-//svg setup
-var svgOpen = '<svg viewBox="0 0 100 100" preserveAspectRatio="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">';
-var svgClose = '</svg>';
 
-//compile svg
-var svgImage = svgOpen + svgClose;
+    function paintCanvas(lonelyMonoliths) {
+        var canvas = document.getElementById("canvas");
+        canvas.innerHTML += lonelyMonoliths;
+    }
 
-//send the image to the webpage
-canvas.innerHTML = svgImage;
+
+    function unveilCanvas() {
+        var cover = document.getElementById('cover');
+        cover.classList.add('cover');
+    }
+
+
+    function generateMonolith() {
+        //store values as objects before populating svg
+        //generate defs for mask cutout by using these values from the stored monolith data
+
+
+        //generate colors
+        //set type: floating, wide, tall
+            //set ground height
+            //generate sky - rect with color fill, rect with black/white gradient & low opacity, low opacity circles for planets?
+            //generate skyline - mountains, hills, ruins, nothing
+            //generate ground
+            //generate monolith
+            //?generate shadow? - onlt for floating? can we make shadows happen with standing monoliths?
+        //?generate color grade rect? - normally #fff, set to another light color if this gets chosen as a feature
+        return 'monolith is lonely';
+    }
+
+
+    //Main logic block
+    paintCanvas(generateMonolith());
+    unveilCanvas();
+})();
