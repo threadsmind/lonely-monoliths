@@ -1,16 +1,14 @@
 /*
 by @threadsmind
 http://threadsmind.com
-
-this script creates an svg image that looks like a lonely little monolith on an alien planet
 */
-var version = '2018.indev.1';
+var version = '2018.indev.2';
 
 
 (function () {
-    var h = 'height=';
-    var w = 'width=';
-    var o = 'opacity=';
+    var h = 'height="';
+    var w = 'width="';
+    var o = 'opacity="';
     var f = 'fill="#';
 
 
@@ -41,16 +39,22 @@ var version = '2018.indev.1';
     }
 
 
-    function generateColors(lightness) {
+    function generateColors(lightness, dayNight) {
         var colorLight = ["c", "d", "e", "f"];
-        var colorDark = ["1", "2", "3", "4", "5"];
-        var colorFull = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-        var colorNonDark = ["6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
         var colorMid = ["6", "7", "8", "9", "a", "b"];
+        var colorDark = ["5", "4", "3", "2", "1"];
+        var colorFull = colorLight.concat(colorMid, colorDark);
+        var colorNonDark = colorLight.concat(colorMid);
         var color = '';
         if (lightness == 'light') {
-            for (i = 0; i < 6; i++) {
-                color += colorLight[generateRandomNumber(0, colorLight.length - 1)];
+            if (dayNight == 'day') {
+                for (i = 0; i < 6; i++) {
+                    color += colorLight[generateRandomNumber(0, colorLight.length - 1)];
+                }
+            } else {
+                var night = `${generateRandomNumber(1, 3)}${generateRandomNumber(0, 9)}`;
+                night += night + `${generateRandomNumber(0,6)}${generateRandomNumber(0, 9)}`;
+                color = night;
             }
         } else if (lightness == 'mid') {
             for (i = 0; i < 6; i++) {
@@ -61,7 +65,12 @@ var version = '2018.indev.1';
                 color += colorNonDark[generateRandomNumber(0, colorNonDark.length - 1)];
             }
         } else if (lightness == 'gsDark') {
-            color += colorDark[generateRandomNumber(0, colorDark.length - 1)];
+
+            if (dayNight == 'day') {
+                color += colorDark[generateRandomNumber(0, colorDark.length - 1)];
+            } else {
+                color += colorMid[generateRandomNumber(0, colorMid.length - 1)];
+            }
             color += colorFull[generateRandomNumber(0, colorFull.length - 1)];
             color += color + color;
         } else {
@@ -98,12 +107,16 @@ var version = '2018.indev.1';
 
 
     function generateSky(skyColor) {
-        return `<rect ${f + skyColor}" ${h}"100%" ${w}"100%" />`;
+        var sky = `<rect ${f + skyColor}" ${h}100%" ${w}100%" />`;
+        sky += `<rect fill="url(#sky-fill)" ${h}100%" ${w}100%" />`;
+        return sky;
     }
 
 
     function generateGround(groundHeight, groundColor) {
-        return `<rect ${f + groundColor}" ${h}"${groundHeight}%" ${w}"100%" y="${100 - groundHeight}%" />`;
+        var ground = `<rect ${f + groundColor}" ${h}${groundHeight + 3}%" ${w}106%" x="-3%" y="${100 - groundHeight}%" filter="url(#ground-blur)" />`;
+        ground += `<rect fill="url(#ground-fill)" ${h + groundHeight}%" ${w}100%" y="${100 - groundHeight}%" />`;
+        return ground;
     }
 
 
@@ -118,7 +131,7 @@ var version = '2018.indev.1';
                 opacity = generateRandomNumber(4, 7);
             }
         }
-        return `<rect ${f + tintColor}" ${h}"100%" ${w}"100%" ${o}".${opacity}" />`;
+        return `<rect ${f + tintColor}" ${h}100%" ${w}100%" ${o}.${opacity}" />`;
     }
 
 
@@ -130,6 +143,50 @@ var version = '2018.indev.1';
             'random'
         ]
         return feelList[generateRandomNumber(0, (feelList.length - 1))];
+    }
+
+    function generateDayNight() {
+        var rand = generateRandomNumber(0, 12);
+        if (rand == 7) {
+            return 'night';
+        } else {
+            return 'day';
+        }
+    }
+
+
+    function generateDefs(monolithType, monolithFeel, groundHeight) { //TODO
+        var defs = '<defs>';
+
+        function makeGradient(id, height, direction) {
+            var offset;
+            if (height == 'half') {
+                offset = generateRandomNumber(40, 60);
+            } else {
+                offset = generateRandomNumber(80, 99);
+            }
+            var opacity;
+            if (direction == 'up') {
+                opacity = [generateRandomNumber(2, 4), generateRandomNumber(0, 1)];
+            } else {
+                opacity = [generateRandomNumber(0, 0), generateRandomNumber(3, 4)];
+            }
+            var gradient = `<lineargradient id="${id}" gradientTransform="rotate(90)">
+                <stop offset="${generateRandomNumber(1, 5)}%" stop-color="#242424" stop-opacity=".${opacity[0]}" />
+                <stop offset="${offset}%" stop-color="#${generateColors('gsDark', null)}" stop-opacity=".${opacity[1]}" />
+                </lineargradient>`;
+            return gradient;
+        }
+
+        function makeBlurFilter(id) {
+            var blur = generateRandomNumber(1, 2);
+            return `<filter id="${id}"><feGaussianBlur in="SourceGraphic" stdDeviation=".${blur}"></feGaussianBlur></filter>`;
+        }
+
+        defs += makeGradient('sky-fill', 'half', 'up');
+        defs += makeGradient('ground-fill', 'full', 'up');
+        defs += makeBlurFilter('ground-blur');
+        return defs + '</defs>';
     }
 
 
@@ -148,18 +205,21 @@ var version = '2018.indev.1';
             }
 
             function makeRect() {
-                //width stuff
-                var rectHighestPoint = highestPoint;
+                //width & height stuff
                 var widthMin = 10;
                 var widthMax = 36;
+                var rectHighestPoint = highestPoint;
                 if (monolithType == 'wide') {
-                    widthMax = 70;
-                    rectHighestPoint += 15;
+                    widthMax = 60;
+                    rectHighestPoint += generateRandomNumber(15, 20);
                 }
                 var width = generateRandomNumber(widthMin, widthMax);
-                var xShift = 50 - (width / 2);
-                //height stuff
+                if (width > 30) {
+                    rectHighestPoint += generateRandomNumber(8, 12);
+                }
                 var height = generateRandomNumber(1, (lowestPoint - rectHighestPoint));
+                //offset stuff
+                var xShift = 50 - (width / 2);
                 var yShift = generateRandomNumber(rectHighestPoint, (lowestPoint - height));
                 if (isFirst) {
                     yShift = lowestPoint - height;
@@ -170,7 +230,11 @@ var version = '2018.indev.1';
                 }
 
                 function feelRound() {
-                    return [generateRandomNumber(1, 50), generateRandomNumber(0, 50)];
+                    var roundUpperBound = 50;
+                    if (height < 20) {
+                        roundUpperBound = generateRandomNumber(5, 20);
+                    }
+                    return [generateRandomNumber(1, roundUpperBound), generateRandomNumber(0, roundUpperBound)];
                 }
 
                 function feelHard() {
@@ -204,7 +268,7 @@ var version = '2018.indev.1';
                 var rx = rxy[0];
                 var ry = rxy[1];
 
-                return `<rect ${f + monolithColor}" ${h}"${height}" ${w}"${width}" x="${xShift}" y="${yShift}" rx="${rx}" ry="${ry}" />`;
+                return `<rect ${f + monolithColor}" ${h + height}" ${w + width}" x="${xShift}" y="${yShift}" rx="${rx}" ry="${ry}" />`;
             }
 
             var shape;
@@ -253,30 +317,32 @@ var version = '2018.indev.1';
 
     function createImage() {
         console.log('lonely monoliths\nv' + version);
+        var dayNight = generateDayNight();
 
-        monolithType = getMonolithType();
-        monolithColors = {
-            'sky': generateColors('light'),
-            'ground': generateColors('mid'),
-            'tint': generateColors('noDark'),
-            'monolith': generateColors('gsDark')
+        var monolithType = getMonolithType();
+        var monolithColors = {
+            'sky': generateColors('light', dayNight),
+            'ground': generateColors('mid', dayNight),
+            'tint': generateColors('noDark', dayNight),
+            'monolith': generateColors('gsDark', dayNight)
         };
-        groundHeight = generateGroundHeight(monolithType);
-        baseHeight = generateBaseHeight(monolithType, groundHeight);
-        monolithFeel = generateFeel();
+        var groundHeight = generateGroundHeight(monolithType);
+        var baseHeight = generateBaseHeight(monolithType, groundHeight);
+        var monolithFeel = generateFeel();
 
-        //TODO generate defs - here? or end? does it matter?
-        sky = generateSky(monolithColors.sky); // TODO add gradient mask
+        var sky = generateSky(monolithColors.sky); // TODO add gradient mask
         //TODO generate planets? - ground color, VERY low opacity
         //TODO generate horizon scenery? - ground color, slightly lowered opacity?
-        ground = generateGround(groundHeight, monolithColors.ground); // TODO add blur mask
+        var ground = generateGround(groundHeight, monolithColors.ground); // TODO add blur mask
         //TODO generate ground texture?
         //TODO generate monolith shadow
-        monolith = generateMonolith(monolithType, baseHeight, monolithColors.monolith, monolithFeel);
-        tint = generateTint(monolithColors.tint);
+        var monolith = generateMonolith(monolithType, baseHeight, monolithColors.monolith, monolithFeel);
+        var tint = generateTint(monolithColors.tint);
+
+        var defs = generateDefs(monolithType, monolithFeel, groundHeight);//TODO generate defs 
 
         console.log('type: ' + monolithType);  // TODO indev only
-        return sky + ground + monolith + tint;
+        return defs + sky + ground + monolith + tint;
     }
 
 
