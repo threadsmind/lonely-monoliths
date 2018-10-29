@@ -317,7 +317,7 @@ var version = '2018.indev.2';
 
     function createImage() {
         console.log('lonely monoliths\nv' + version);
-        var dayNight = generateDayNight();
+        var dayNight = 'day'; //generateDayNight();
 
         var monolithType = getMonolithType();
         var monolithColors = {
