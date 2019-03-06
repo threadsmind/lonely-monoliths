@@ -4,7 +4,7 @@ An image generation script by [Brandon Thread](http://threadsmind.com).
 
 [Try "Lonely Monoliths" here.](https://threadsmind.github.io/lonely-monoliths/)
 
-This script creates an SVG image of an strange monolith on an open field.
+This script creates an SVG image of a strange monolith on an open field.
 
 A previous version of this script can be found running as a Twitter bot here: [@lonelymonoliths](https://twitter.com/lonelymonoliths).
 
