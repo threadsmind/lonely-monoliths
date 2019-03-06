@@ -192,7 +192,7 @@ var version = '2018.indev.2';
 
     function generateMonolith(monolithType, lowestPoint, monolithColor, monolithFeel) {
         var highestPoint = 15;
-        var monolith = `<g mask="url(#monolith-mask)">`;
+        var monolith = `<g mask="">`;
 
         function makeShape(shapeType, isFirst) {
             var shapeList = {
