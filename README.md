@@ -8,6 +8,9 @@ A previous version of this script can be found running as a Twitter bot here: [@
 
 ## Release Notes
 
+### 2020.indev.3
+- added the possibility for floating monoliths to be filtered inside an outer shape
+
 ### 2020.indev.2
 - monoliths now generate holes
 

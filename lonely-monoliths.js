@@ -2,7 +2,7 @@
 by @threadsmind
 http://threadsmind.com
 */
-const version = '2020.indev.2';
+const version = '2020.indev.3';
 console.log('lonely monoliths\nv' + version);
 
 const cover = document.getElementById('cover');
@@ -168,18 +168,25 @@ const newMonolith = () => {
     }
 
     const makeMask = (id, cutout) => {
-      const doMask = generateRandomNumber(0, 2) === 1 ? true : false;
+      const doMask = cutout ?
+        generateRandomNumber(0, 2) === 1 ? true : false :
+        generateRandomNumber(0, 12) === 4 ? true : false;
       let mask = ''
       if (doMask) {
-        const masks = Math.abs(generateRandomNumber(3, 8) - generateRandomNumber(0, 5));
+        const masks = cutout ? Math.abs(generateRandomNumber(3, 8) - generateRandomNumber(0, 5)) :
+          generateRandomNumber(0, 3);
         mask = `<mask id="${id}">`;
-        mask += cutout ? '<rect width=100% height=100% fill=#fff></rect>' : '';
+        mask += cutout ? '<rect width=100% height=100% fill=#fff></rect>' :
+          `<circle cx=50% cy=${generateRandomNumber(35, 55)}% r=${generateRandomNumber(16, 28)} fill=#fff /></circle>`;
         if (masks != 0) {
           for (i = 0; i < masks; i++) {
-            mask += `<circle cx="50%" cy="${generateRandomNumber(30, 60)}%" r="${generateRandomNumber(1,6)}" fill="#000000"/>`
+            mask += `<circle cx=50% cy=${generateRandomNumber(30, 60)}% r=${generateRandomNumber(1, 6)} fill=#${cutout ? `000` : 'fff'} /></circle>`
           }
         }
         mask += '</mask>'
+      }
+      if (!cutout && doMask) {
+        console.log('filter cutout');
       }
       return mask;
     }
@@ -189,6 +196,7 @@ const newMonolith = () => {
       ${makeGradient('ground-fill', 'full', 'down')}
       ${makeBlurFilter('ground-blur')}
       ${makeMask('cutout-mask', true)}
+      ${monolithType === 'floating' ? makeMask('filter-mask', false) : ''}
       </defs>`;
   }
 
@@ -265,7 +273,7 @@ const newMonolith = () => {
         fallbackShapeType();;
     }
 
-    let monolith = `<g mask="url(#cutout-mask)">`;
+    let monolith = `<g mask="url(#filter-mask)"><g mask="url(#cutout-mask)">`;
 
     //always generates at least 1 shape...
     monolith += monolithType != 'floating' ?
@@ -292,7 +300,7 @@ const newMonolith = () => {
     }
     console.log(`parts: ${currentSafetyNum + 1}`); // TODO indev only - maybe add custom logger
 
-    return monolith.concat('</g>');
+    return monolith.concat('</g></g>');
   }
 
   const createImage = () => {
