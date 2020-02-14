@@ -3,13 +3,17 @@ by @threadsmind
 http://threadsmind.com
 */
 const version = '2020.indev.3';
+console.log('lonely monoliths\nv' + version);
 
+const cover = document.getElementById('cover');
+const canvas = document.getElementById("canvas");
 
-(() => {
+const newMonolith = () => {
   const h = 'height="';
   const w = 'width="';
   const o = 'opacity="';
   const f = 'fill="#';
+  let veilOpacity = 1;
 
 
   const generateRandomNumber = (randLow, randHigh) => {
@@ -17,13 +21,25 @@ const version = '2020.indev.3';
   }
 
   const paintCanvas = (lonelyMonoliths) => {
-    const canvas = document.getElementById("canvas");
     canvas.innerHTML += lonelyMonoliths;
   }
 
+  const lerp = (from, to, delta) => {
+    return (1 - delta) * from + delta * to;
+  }
+
+  const reveilCanvas = () => {
+    cover.style.opacity = 1;
+  }
+
   const unveilCanvas = () => {
-    const cover = document.getElementById('cover');
-    cover.classList.add('cover');
+    if (veilOpacity >= 0.01) {
+      veilOpacity = lerp(veilOpacity, 0, 0.08);
+      window.requestAnimationFrame(unveilCanvas);
+    } else {
+      veilOpacity = 0;
+    }
+    cover.style.opacity = veilOpacity;
   }
 
 
@@ -260,7 +276,6 @@ const version = '2020.indev.3';
   }
 
   const createImage = () => {
-    console.log('lonely monoliths\nv' + version);
     const dayNight = 'day'; //generateDayNight();
 
     const monolithType = getMonolithType();
@@ -290,8 +305,16 @@ const version = '2020.indev.3';
     return `${defs}${sky}${ground}${monolith}${tint}`;
   }
 
-
-  //Main block
+  reveilCanvas();
   paintCanvas(createImage());
   unveilCanvas();
-})();
+};
+
+// add button input
+const newBtn = document.getElementById('new-lith');
+['mousedown', 'touchstart', 'keydown'].forEach(input => {
+  newBtn.addEventListener(input, newMonolith);
+});
+
+// build first monolith
+newMonolith();
