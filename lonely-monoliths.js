@@ -2,7 +2,7 @@
 by @threadsmind
 http://threadsmind.com
 */
-const version = '2020.indev.3';
+const version = '2020.indev.2';
 console.log('lonely monoliths\nv' + version);
 
 const cover = document.getElementById('cover');
@@ -21,7 +21,7 @@ const newMonolith = () => {
   }
 
   const paintCanvas = (lonelyMonoliths) => {
-    canvas.innerHTML += lonelyMonoliths;
+    canvas.innerHTML = lonelyMonoliths;
   }
 
   const lerp = (from, to, delta) => {
@@ -163,14 +163,32 @@ const newMonolith = () => {
     }
 
     const makeBlurFilter = (id) => {
-      const blur = generateRandomNumber(1, 2);
+      const blur = generateRandomNumber(1, 3);
       return `<filter id="${id}"><feGaussianBlur in="SourceGraphic" stdDeviation=".${blur}"></feGaussianBlur></filter>`;
+    }
+
+    const makeMask = (id, cutout) => {
+      const doMask = generateRandomNumber(0, 2) === 1 ? true : false;
+      let mask = ''
+      if (doMask) {
+        const masks = Math.abs(generateRandomNumber(3, 8) - generateRandomNumber(0, 5));
+        mask = `<mask id="${id}">`;
+        mask += cutout ? '<rect width=100% height=100% fill=#fff></rect>' : '';
+        if (masks != 0) {
+          for (i = 0; i < masks; i++) {
+            mask += `<circle cx="50%" cy="${generateRandomNumber(30, 60)}%" r="${generateRandomNumber(1,6)}" fill="#000000"/>`
+          }
+        }
+        mask += '</mask>'
+      }
+      return mask;
     }
 
     return `<defs>
       ${makeGradient('sky-fill', 'half', 'up')}
-      ${makeGradient('ground-fill', 'full', 'up')}
+      ${makeGradient('ground-fill', 'full', 'down')}
       ${makeBlurFilter('ground-blur')}
+      ${makeMask('cutout-mask', true)}
       </defs>`;
   }
 
@@ -194,14 +212,15 @@ const newMonolith = () => {
           generateRandomNumber(rectHighestPoint, (lowestPoint - height));
 
         //curve stuff
-        const feelSoft = () => { // TODO ??? Is this unfinished?
-          return [1, 1];
+        const feelSoft = () => {
+          const soft = generateRandomNumber(1, 2);
+          return [soft, soft];
         }
         const feelRound = () => {
           const roundUpperBound = height < 20 ? generateRandomNumber(5, 20) : 50;
           return [generateRandomNumber(1, roundUpperBound), generateRandomNumber(0, roundUpperBound)];
         }
-        const feelHard = () => { // TODO ???? Is this incomplete?
+        const feelHard = () => { // TODO why?
           return [0, 0];
         }
         const feelRandom = () => { // TODO maybe revisit this
@@ -241,11 +260,12 @@ const newMonolith = () => {
         return shapeList[shapeListKeyArray[shapeListKey]]();
       };
 
+      // generate a shape and return it's SVG element as a string
       return !!shapeType ? shapeList[shapeType]() :
         fallbackShapeType();;
     }
 
-    let monolith = `<g mask="">`; // TODO what is this mask?
+    let monolith = `<g mask="url(#cutout-mask)">`;
 
     //always generates at least 1 shape...
     monolith += monolithType != 'floating' ?
@@ -300,7 +320,7 @@ const newMonolith = () => {
 
     const defs = generateDefs(monolithType, monolithFeel, groundHeight); // TODO generate defs
 
-    console.log('type: ' + monolithType);  // TODO indev only - custom logger?
+    console.log(`type: ${monolithType}\nfeel: ${monolithFeel}`);  // TODO indev only - custom logger?
 
     return `${defs}${sky}${ground}${monolith}${tint}`;
   }
