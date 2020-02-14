@@ -8,7 +8,7 @@ A previous version of this script can be found running as a Twitter bot here: [@
 
 ## Release Notes
 
-### 2020.indev.3
+### 2020.indev.1
 - generate new monoliths with a button press
 
 ### 2018.indev.2
