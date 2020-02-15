@@ -2,8 +2,12 @@
 by @threadsmind
 http://threadsmind.com
 */
-const version = '2020.indev.3';
-console.log('lonely monoliths\nv' + version);
+
+// TODO better comments
+// TODO refactor to generate obj first then render to SVG
+
+const version = '2020.0';
+console.info('lonely monoliths\nv' + version);
 
 const cover = document.getElementById('cover');
 const canvas = document.getElementById("canvas");
@@ -59,8 +63,8 @@ const newMonolith = () => {
     const colorFull = colorLight.concat(colorMid, colorDark);
     const colorNonDark = colorLight.concat(colorMid);
     let color = '';
-    if (lightness == 'light') {
-      if (dayNight == 'day') {
+    if (lightness === 'light') {
+      if (dayNight === 'day') {
         for (i = 0; i < 6; i++) {
           color += colorLight[generateRandomNumber(0, colorLight.length - 1)];
         }
@@ -69,23 +73,28 @@ const newMonolith = () => {
         night += night + `${generateRandomNumber(0, 6)}${generateRandomNumber(0, 9)}`;
         color = night;
       }
-    } else if (lightness == 'mid') {
+    } else if (lightness === 'mid') {
       for (i = 0; i < 6; i++) {
         color += colorMid[generateRandomNumber(0, colorMid.length - 1)];
       }
-    } else if (lightness == 'noDark') {
+    } else if (lightness === 'noDark') {
       for (i = 0; i < 6; i++) {
         color += colorNonDark[generateRandomNumber(0, colorNonDark.length - 1)];
       }
-    } else if (lightness == 'gsDark') {
+    } else if (lightness === 'gsDark') {
 
-      if (dayNight == 'day') {
+      if (dayNight === 'day') {
         color += colorDark[generateRandomNumber(0, colorDark.length - 1)];
       } else {
         color += colorMid[generateRandomNumber(0, colorMid.length - 1)];
       }
       color += colorFull[generateRandomNumber(0, colorFull.length - 1)];
       color += color + color;
+    } else if (lightness === 'shadow') {
+      const dark = colorDark[generateRandomNumber(0, colorDark.length - 1)];
+      for (i = 0; i < 6; i++) {
+        color += dark;
+      }
     } else {
       for (i = 0; i < 6; i++) {
         color += colorFull[generateRandomNumber(0, colorFull.length - 1)];
@@ -147,7 +156,7 @@ const newMonolith = () => {
     return rand === 7 ? 'night' : 'day'; // TODO why 7?
   }
 
-  const generateDefs = (monolithType, monolithFeel, groundHeight) => { //TODO
+  const generateDefs = (monolithType, monolithFeel, groundHeight) => {
     const makeGradient = (id, height, direction) => {
       const offset = height === 'half' ?
         generateRandomNumber(40, 60) :
@@ -185,9 +194,6 @@ const newMonolith = () => {
         }
         mask += '</mask>'
       }
-      if (!cutout && doMask) {
-        console.log('filter cutout');
-      }
       return mask;
     }
 
@@ -195,6 +201,7 @@ const newMonolith = () => {
       ${makeGradient('sky-fill', 'half', 'up')}
       ${makeGradient('ground-fill', 'full', 'down')}
       ${makeBlurFilter('ground-blur')}
+      ${makeBlurFilter('shadow-blur')}
       ${makeMask('cutout-mask', true)}
       ${monolithType === 'floating' ? makeMask('filter-mask', false) : ''}
       </defs>`;
@@ -228,10 +235,10 @@ const newMonolith = () => {
           const roundUpperBound = height < 20 ? generateRandomNumber(5, 20) : 50;
           return [generateRandomNumber(1, roundUpperBound), generateRandomNumber(0, roundUpperBound)];
         }
-        const feelHard = () => { // TODO why?
+        const feelHard = () => {
           return [0, 0];
         }
-        const feelRandom = () => { // TODO maybe revisit this
+        const feelRandom = () => {
           const feelList = {
             'soft': feelSoft,
             'round': feelRound,
@@ -298,39 +305,52 @@ const newMonolith = () => {
         break;
       }
     }
-    console.log(`parts: ${currentSafetyNum + 1}`); // TODO indev only - maybe add custom logger
 
     return monolith.concat('</g></g>');
   }
 
+  const generateShadow = (location, ground, type, color) => {
+    ground = 100 - ground;
+    location = (ground + 6 <= location) ? location : ground + generateRandomNumber(8, 14);
+    const height = generateRandomNumber(4, 9);
+    const width = type === 'wide' ? generateRandomNumber(58, 68) :
+      type === 'tall' ? generateRandomNumber(38, 50) : generateRandomNumber(24, 34);
+    return `<rect fill=${color} opacity=0.${generateRandomNumber(1, 5)}
+        height=${height} width=${width}
+        x=${50 - (width / 2)} y=${location - (height / 2)}%
+        rx=${generateRandomNumber(20, 50)} ry=${generateRandomNumber(20, 50)}
+        filter="url(#shadow-blur)">
+      </rect>`;
+  }
+
   const createImage = () => {
-    const dayNight = 'day'; //generateDayNight();
+    const dayNight = 'day'; // TODO generateDayNight();
 
     const monolithType = getMonolithType();
     const monolithColors = {
       'sky': generateColors('light', dayNight),
       'ground': generateColors('mid', dayNight),
       'tint': generateColors('noDark', dayNight),
-      'monolith': generateColors('gsDark', dayNight)
+      'monolith': generateColors('gsDark', dayNight),
+      'shadow' : generateColors('', dayNight)
     };
     const groundHeight = generateGroundHeight(monolithType);
     const baseHeight = generateBaseHeight(monolithType, groundHeight);
     const monolithFeel = generateFeel();
 
-    const sky = generateSky(monolithColors.sky); // TODO add gradient mask
+    const sky = generateSky(monolithColors.sky);
     //TODO generate planets? - ground color, VERY low opacity
     //TODO generate horizon scenery? - ground color, slightly lowered opacity?
-    const ground = generateGround(groundHeight, monolithColors.ground); // TODO add blur mask
+    const ground = generateGround(groundHeight, monolithColors.ground);
     //TODO generate ground texture?
-    //TODO generate monolith shadow
+    const shadow = generateShadow(baseHeight, groundHeight, monolithType, monolithColors.shadow);
     const monolith = generateMonolith(monolithType, baseHeight, monolithColors.monolith, monolithFeel);
     const tint = generateTint(monolithColors.tint);
 
-    const defs = generateDefs(monolithType, monolithFeel, groundHeight); // TODO generate defs
+    const defs = generateDefs(monolithType, monolithFeel, groundHeight);
 
-    console.log(`type: ${monolithType}\nfeel: ${monolithFeel}`);  // TODO indev only - custom logger?
-
-    return `${defs}${sky}${ground}${monolith}${tint}`;
+    // return render queue (<- back to front ->)
+    return `${defs}${sky}${ground}${shadow}${monolith}${tint}`;
   }
 
   reveilCanvas();

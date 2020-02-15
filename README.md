@@ -4,9 +4,14 @@ An image generation script by [Brandon Thread](http://threadsmind.com).
 
 This script creates an SVG image of an strange monolith on an open field.
 
-A previous version of this script can be found running as a Twitter bot here: [@lonelymonoliths](https://twitter.com/lonelymonoliths).
+A previous version of this script can be found running as a Twitter/Tracery bot here: [@lonelymonoliths](https://twitter.com/lonelymonoliths).
 
 ## Release Notes
+
+### 2020.0
+- added shadows
+- minor clean-up
+- feature parity with [@lonelymonoliths](https://twitter.com/lonelymonoliths) twitter bot
 
 ### 2020.indev.3
 - added the possibility for floating monoliths to be filtered inside an outer shape
