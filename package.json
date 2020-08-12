@@ -1,0 +1,23 @@
+{
+  "name": "lonely-monoliths",
+  "version": "2020.8.11",
+  "description": "Lonely Monoliths is an image generator that uses p5.js to create scenes of lost and lonely monolithic structures in alien landscapes.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/threadsmind/lonely-monoliths.git"
+  },
+  "author": "Brandon Thread",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/threadsmind/lonely-monoliths/issues"
+  },
+  "homepage": "https://github.com/threadsmind/lonely-monoliths#readme",
+  "dependencies": {
+    "jsdom": "^16.4.0",
+    "twit": "^2.2.11"
+  }
+}
