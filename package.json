@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/threadsmind/lonely-monoliths#readme",
   "dependencies": {
+    "canvas": "^2.6.1",
     "jsdom": "^16.4.0",
     "twit": "^2.2.11"
   }
