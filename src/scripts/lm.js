@@ -33,6 +33,10 @@ const generatorData = {
 
 // create p5 instance for more control
 const s = p => {
+  // grab textarea to display image data (will be null on server)
+  const textData = document.querySelector('textarea');
+  // grab p to display errors (will be null on server)
+  const outputConsole = document.querySelector('span');
   // create ui on client-side
   const createUI = () => {
     if (!APP_SETTINGS.isServer) {
@@ -42,7 +46,6 @@ const s = p => {
       btnRedraw.addEventListener('click', redraw);
       btnRedraw.addEventListener('touchstart', redraw);
       btnRedraw.addEventListener('keyup', redraw);
-      // TODO: connect the data object textarea display
     }
   }
 
@@ -50,8 +53,17 @@ const s = p => {
   const redraw = () => {
     logger('redraw');
     // TODO: try to parse data from <textarea>
-    // TODO: if data parses, then call this p.redraw() function
-    p.redraw();
+    try {
+      generatorData.test = JSON.parse(textData.value);
+      // if data parses, then call this p.redraw() function
+      outputConsole.innerText = '';
+      p.redraw();
+    } catch (e) {
+      // send message to output consoles
+      logger(e);
+      outputConsole.innerText = 'Data input is not valid JSON';
+    }
+
   };
 
   p.setup = function () {
@@ -76,7 +88,10 @@ const s = p => {
     p.background(0);
     const f = p.random(0, 255);
     p.fill(f);
-    p.rect(100, 100, 50, 50);
+    p.rect(100, 100, generatorData.test.w, generatorData.test.h);
+
+    // update the data display on client-side
+    textData && (textData.value = JSON.stringify(generatorData.test, null, '  '));
 
     // call this after drawing for logging and server-side flagging
     complete();
