@@ -1,12 +1,4 @@
-// DOM flag for use in jsdom automation
-function complete() {
-  logger('drawing complete');
-  if (APP_SETTINGS.isServer) {
-    window.imageComplete = true;
-  }
-}
-
-//app settings (probably move this)
+//app settings
 const APP_SETTINGS = {
   logging: true, // TODO: set this with an "or" and check for an environment variable
   isServer: navigator.userAgent.includes('jsdom'),
@@ -19,11 +11,28 @@ const logger = message => {
   }
 };
 
-// look into data storage logic here
+// DOM flag for use in jsdom automation
+function complete() {
+  logger('drawing complete');
+  if (APP_SETTINGS.isServer) {
+    window.imageComplete = true;
+  }
+}
+
+// holds data about the image
 const generatorData = {
-  test: {
-    h: 100,
-    w: 75,
+  data: {
+    canvas: {
+      w: 700,
+      h: 410,
+    },
+    layers: [
+      {
+        type: 'box',
+        h: 100,
+        w: 75,
+      }
+    ],
   }
 };
 
@@ -33,6 +42,11 @@ const generatorData = {
 
 // create p5 instance for more control
 const s = p => {
+  // this is the data generator
+  const generateData = () => {
+
+  }
+
   // grab textarea to display image data (will be null on server)
   const textData = document.querySelector('textarea');
   // grab p to display errors (will be null on server)
@@ -49,12 +63,12 @@ const s = p => {
     }
   }
 
-  // asks p5 to redraw the scene
+  // asks p5 to redraw the scene - TODO add procgen option
   const redraw = () => {
     logger('redraw');
-    // TODO: try to parse data from <textarea>
+    // try to parse data from <textarea>
     try {
-      generatorData.test = JSON.parse(textData.value);
+      generatorData.data = JSON.parse(textData.value);
       // if data parses, then call this p.redraw() function
       outputConsole.innerText = '';
       p.redraw();
@@ -68,8 +82,8 @@ const s = p => {
 
   p.setup = function () {
     createUI();
-    p.createCanvas(700, 410);
-
+    generateData();
+    p.createCanvas(generatorData.data.canvas.w, generatorData.data.canvas.h);
     /* REQUIRED: p.noLoop();
     * On client-side there's no need to render more than once.
     * On server-side render-once keeps processing power low because money
@@ -88,10 +102,10 @@ const s = p => {
     p.background(0);
     const f = p.random(0, 255);
     p.fill(f);
-    p.rect(100, 100, generatorData.test.w, generatorData.test.h);
+    p.rect(100, 100, generatorData.data.layers[0].w, generatorData.data.layers[0].h);
 
     // update the data display on client-side
-    textData && (textData.value = JSON.stringify(generatorData.test, null, '  '));
+    textData && (textData.value = JSON.stringify(generatorData.data, null, '  '));
 
     // call this after drawing for logging and server-side flagging
     complete();
