@@ -1,7 +1,17 @@
-//app settings
+// app settings
 const APP_SETTINGS = {
-  logging: true, // TODO: set this with an "or" and check for an environment variable
+  logging: true,
   isServer: navigator.userAgent.includes('jsdom'),
+};
+
+/* generator settings:
+* these settings provide the default Lonely Monoliths experience
+*/
+const GENERATOR_SETTINGS = {
+  canvas: {
+    h: 512,
+    w: 512,
+  }
 };
 
 // togglable logger for use in dev... or prod debugging
@@ -20,20 +30,22 @@ function complete() {
 }
 
 // holds data about the image
-const generatorData = {
-  data: {
-    canvas: {
-      w: 700,
-      h: 410,
-    },
-    layers: [
-      {
-        type: 'box',
-        h: 100,
-        w: 75,
-      }
-    ],
-  }
+const imageData = {
+  data: [
+    {type: 'test', color: '#321098'}
+    /* render will render from "0 -> n" aka "back-> front" so order matters
+    {type: 'sky'},
+    {type: 'stars'},
+    {type: 'planets'},
+    {type: 'ground'},
+    {type: 'city'},
+    {type: 'mountains'},
+    {type: 'hills'},
+    {type: 'monolith'},
+    // foreground stuff? rocks, trees, ruins, hills?
+    {type: 'rain'},
+    {type: 'frame'},*/
+  ]
 };
 
 
@@ -57,9 +69,9 @@ const s = p => {
       logger('connecting client-side UI');
       // connect the redraw button
       const btnRedraw = document.querySelector('button');
-      btnRedraw.addEventListener('click', redraw);
-      btnRedraw.addEventListener('touchstart', redraw);
-      btnRedraw.addEventListener('keyup', redraw);
+      ['click', 'touchstart', 'keyup'].forEach(i => {
+        btnRedraw.addEventListener(i, redraw);
+      });
     }
   }
 
@@ -68,7 +80,7 @@ const s = p => {
     logger('redraw');
     // try to parse data from <textarea>
     try {
-      generatorData.data = JSON.parse(textData.value);
+      imageData.data = JSON.parse(textData.value);
       // if data parses, then call this p.redraw() function
       outputConsole.innerText = '';
       p.redraw();
@@ -80,10 +92,18 @@ const s = p => {
 
   };
 
+  // a list of generators available to LM
+  const layerTemplates = {
+    test: function(layerData) {
+      p.background(layerData.color);
+    }
+  };
+
+  // sets up the p5 environment
   p.setup = function () {
     createUI();
     generateData();
-    p.createCanvas(generatorData.data.canvas.w, generatorData.data.canvas.h);
+    p.createCanvas(GENERATOR_SETTINGS.canvas.w, GENERATOR_SETTINGS.canvas.h);
     /* REQUIRED: p.noLoop();
     * On client-side there's no need to render more than once.
     * On server-side render-once keeps processing power low because money
@@ -93,23 +113,22 @@ const s = p => {
 
   // draw loops. use p.redraw() to manually invoke
   p.draw = function () {
-    /* TODO:
-    * Work out draw functions and logic.
-    * How do we programmatically draw shapes based on an incoming data object?
-    */
-
-    // placeholder test drawing. please discard
-    p.background(0);
-    const f = p.random(0, 255);
-    p.fill(f);
-    p.rect(100, 100, generatorData.data.layers[0].w, generatorData.data.layers[0].h);
+    // send each data array element off to be drawn by a template
+    imageData.data.forEach(layer => {
+      if (layerTemplates[layer.type]) {
+        layerTemplates[layer.type](layer);
+      } else {
+        logger(`error! layer template type "${layer.type}" does not exist!`);
+      }
+    });
 
     // update the data display on client-side
-    textData && (textData.value = JSON.stringify(generatorData.data, null, '  '));
+    textData && (textData.value = JSON.stringify(imageData.data, null, '  '));
 
     // call this after drawing for logging and server-side flagging
     complete();
   };
 };
+
 // invoke p5 instance
 new p5(s, 'canvas');
