@@ -1,21 +1,29 @@
-// app settings
-const APP_SETTINGS = {
-  logging: true,
-  isServer: navigator.userAgent.includes("jsdom"),
-};
-/* generator settings:
- * these settings provide the default Lonely Monoliths experience
- */
+// ===========================================================================================
+// GENERATOR SETTINGS
+// ===========================================================================================
+// these settings provide the default Lonely Monoliths experience.
 const GENERATOR_SETTINGS = {
   canvas: {
-    h: 512,
     w: 512,
+    h: 512,
   },
 };
-// holds data about the image
+
+// ===========================================================================================
+// IMAGE DATA
+// ===========================================================================================
+// default imageData is an empty object.
+// the renderer uses data populated here to draw an image.
+// each object in the "data" array is required to have a key "type" that corresponds to a render layer template.
 const imageData = {
   data: [
-    { type: "test", color: "#321098" },
+    {
+      type: "example",
+      color: [175, 125, 71],
+      alpha: 1,
+      square: [30, 20, 55],
+      blur: 2
+    },
     /* render will render from "0 -> n" aka "back-> front" so order matters
     {type: 'sky'},
     {type: 'stars'},
@@ -31,12 +39,48 @@ const imageData = {
   ],
 };
 
+// ===========================================================================================
+// RENDERER LAYER TEMPLATES
+// ===========================================================================================
+/* a list of generators available to LM.
+ * NOTE: each function should take in: [1] an object for the layer's image data and [2] a p5 renderer.
+ */
+const layerTemplates = {
+  // this is an example layer template
+  example: function (layerData, renderer) {
+    /* When blur is applied to an object on a transparent background it is required to set the
+     * layer background to the same color as the rendered object (but with 0.01 alpha), because p5's
+     * blur function blends the the background color with the rendered object as if the background
+     * were not transparent. The default result leaves a blurred shadow around the rendered object.
+     * NOTE: There may be lower-level canvas options that could mitigate this.
+     */
+    renderer.colorMode(renderer.RGB, 255, 255, 255, 1.0); // colorMode is required to be RGB x,x,x,x for blur to work.
+    renderer.background(...layerData.color, 0.01); // alpha at 0.01 for blur to work.
+    renderer.noStroke();
+    renderer.fill(...layerData.color, layerData.alpha);
+    renderer.square(...layerData.square);
+    renderer.filter(renderer.BLUR, layerData.blur); // see notes above. using blur in a temporary renderer comes with requirements.
+    return renderer; // all templates MUST return the renderer they were given to be rendered to the final canvas.
+  },
+};
+
+// ===========================================================================================
+// APP STUFF
+// ===========================================================================================
+
+// app settings
+const APP_SETTINGS = {
+  logging: true, // probably change this to 'false' for production use.
+  generateData: true, // change this to 'false' to display custom image data on page load.
+  isServer: navigator.userAgent.includes("jsdom"),
+};
+
 // togglable logger for use in dev... or prod debugging
 function LOGGER(message) {
   if (APP_SETTINGS.logging) {
     console.log(`%cLogger: ${message}`, "color: #fff; background: #000;");
   }
-};
+}
 // DOM flag for use in jsdom automation
 function complete() {
   LOGGER("drawing complete");
@@ -46,22 +90,23 @@ function complete() {
 }
 
 // ===========================================================================================
+// IMAGE DATA GENERATOR
+// ===========================================================================================
+// this is the image data generator
+const generateData = () => {};
+
+// ===========================================================================================
+// p5 LIFECYCLE
+// ===========================================================================================
 
 // create p5 instance for more control
 const s = (p) => {
+  const canvas = GENERATOR_SETTINGS.canvas;
   // grab textarea to display image data (will be null on server)
   const textData = document.querySelector("textarea");
-  // grab p to display errors (will be null on server)
+  // grab span to display errors (will be null on server)
   const outputConsole = document.querySelector("span");
-  // a list of generators available to LM
-  const layerTemplates = {
-    test: function (layerData) {
-      p.background(layerData.color);
-    },
-  };
 
-  // this is the data generator
-  function generateData() {}
   // create ui on client-side
   function createUI() {
     if (!APP_SETTINGS.isServer) {
@@ -85,14 +130,14 @@ const s = (p) => {
     } catch (e) {
       // send message to output consoles
       LOGGER(e);
-      outputConsole.innerText = "Data input is not valid JSON";
+      outputConsole.innerText += "Data input is not valid JSON\n";
     }
-  };
+  }
   // sets up the p5 environment
   p.setup = function () {
     createUI();
     generateData();
-    p.createCanvas(GENERATOR_SETTINGS.canvas.w, GENERATOR_SETTINGS.canvas.h);
+    p.createCanvas(canvas.w, canvas.h);
     /* REQUIRED: p.noLoop();
      * On client-side there's no need to render more than once.
      * On server-side render-once keeps processing power low because money
@@ -101,12 +146,22 @@ const s = (p) => {
   };
   // draw loops. use p.redraw() to manually invoke
   p.draw = function () {
-    // send each data array element off to be drawn by a template
-    imageData.data.forEach((layer) => {
-      if (layerTemplates[layer.type]) {
-        layerTemplates[layer.type](layer);
+    // send each image data array element off to be drawn by a template
+    imageData.data.forEach((layerData) => {
+      if (layerTemplates[layerData.type]) {
+        // create a p5 renderer on which the layer template can render stuff
+        const newRenderer = p.createGraphics(canvas.w, canvas.h);
+        // send the new renderer off to its layer template function to be rendered, then store the returned renderer
+        const renderedRenderer = layerTemplates[layerData.type](
+          layerData,
+          newRenderer
+        );
+        // render the newly rendered p5 renderer as a p5 image component to the main canvas
+        p.image(renderedRenderer, 0, 0);
       } else {
-        LOGGER(`error! layer template type "${layer.type}" does not exist!`);
+        const log = `error! layer template type "${layerData.type}" does not exist!`;
+        outputConsole.innerText += `${log}\n`;
+        LOGGER(log);
       }
     });
     // update the data display on client-side
@@ -116,5 +171,13 @@ const s = (p) => {
   };
 };
 
+// ===========================================================================================
+// APP FUNCTIONALITY EXECUTION
+// ===========================================================================================
+
+// check if we should generate new image data
+if (APP_SETTINGS.generateData) {
+  generateData();
+}
 // invoke p5 instance
 new p5(s, "canvas");
