@@ -24,18 +24,18 @@ const imageData = {
       square: [30, 20, 55],
       blur: 2
     },
-    /* render will render from "0 -> n" aka "back-> front" so order matters
+    // render will render from "0 -> n" aka "back-> front" so order matters
     {type: 'sky'},
-    {type: 'stars'},
-    {type: 'planets'},
-    {type: 'ground'},
-    {type: 'city'},
-    {type: 'mountains'},
-    {type: 'hills'},
-    {type: 'monolith'},
+    //{type: 'stars'},
+    //{type: 'planets'},
+    //{type: 'ground'},
+    //{type: 'city'},
+    //{type: 'mountains'},
+    //{type: 'hills'},
+    //{type: 'monolith'},
     // foreground stuff? rocks, trees, ruins, hills?
-    {type: 'rain'},
-    {type: 'frame'},*/
+    //{type: 'rain'},
+    //{type: 'frame'}
   ],
 };
 
@@ -67,7 +67,6 @@ const layerTemplates = {
 // ===========================================================================================
 // APP STUFF
 // ===========================================================================================
-
 // app settings
 const APP_SETTINGS = {
   logging: true, // probably change this to 'false' for production use.
@@ -98,7 +97,6 @@ const generateData = () => {};
 // ===========================================================================================
 // p5 LIFECYCLE
 // ===========================================================================================
-
 // create p5 instance for more control
 const s = (p) => {
   const canvas = GENERATOR_SETTINGS.canvas;
@@ -106,7 +104,6 @@ const s = (p) => {
   const textData = document.querySelector("textarea");
   // grab span to display errors (will be null on server)
   const outputConsole = document.querySelector("span");
-
   // create ui on client-side
   function createUI() {
     if (!APP_SETTINGS.isServer) {
@@ -174,7 +171,6 @@ const s = (p) => {
 // ===========================================================================================
 // APP FUNCTIONALITY EXECUTION
 // ===========================================================================================
-
 // check if we should generate new image data
 if (APP_SETTINGS.generateData) {
   generateData();
