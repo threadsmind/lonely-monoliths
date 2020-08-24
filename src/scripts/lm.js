@@ -17,15 +17,19 @@ const GENERATOR_SETTINGS = {
 // each object in the "data" array is required to have a key "type" that corresponds to a render layer template.
 const imageData = {
   data: [
-    {
+    /* {
       type: "example",
       color: [175, 125, 71],
       alpha: 1,
       square: [30, 20, 55],
       blur: 2
+    }, */
+    // the template renderer will render from "array[0] -> array[n]" aka "back -> front" so order matters
+    {
+      type: 'sky',
+      colorA: [128, 128, 128],
+      colorB: [255, 255, 255]
     },
-    // render will render from "0 -> n" aka "back-> front" so order matters
-    {type: 'sky'},
     //{type: 'stars'},
     //{type: 'planets'},
     //{type: 'ground'},
@@ -62,6 +66,10 @@ const layerTemplates = {
     renderer.filter(renderer.BLUR, layerData.blur); // see notes above. using blur in a temporary renderer comes with requirements.
     return renderer; // all templates MUST return the renderer they were given to be rendered to the final canvas.
   },
+  sky: function (layerData, renderer) {
+    helpers.linearGradient(renderer, layerData.colorA, layerData.colorB);
+    return renderer;
+  },
 };
 
 // ===========================================================================================
@@ -89,10 +97,28 @@ function complete() {
 }
 
 // ===========================================================================================
+// RENDERER HELPERS
+// ===========================================================================================
+const helpers = {
+  linearGradient: function (renderer, cArrayA, cArrayB) {
+    const h = renderer.height;
+    const w = renderer.width;
+    const c1 = renderer.color(...cArrayA);
+    const c2 = renderer.color(...cArrayB);
+    let color = null;
+    for (let i = 0; i <= h; i++) {
+      color = (i === 0) ? c1 : renderer.lerpColor(c1, c2, i / h);
+      renderer.stroke(color);
+      renderer.line(0, i, w, i);
+    }
+  },
+};
+
+// ===========================================================================================
 // IMAGE DATA GENERATOR
 // ===========================================================================================
 // this is the image data generator
-const generateData = () => {};
+const generateData = () => { };
 
 // ===========================================================================================
 // p5 LIFECYCLE
